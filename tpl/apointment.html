@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Dental ordination Šetić</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- ======= Top Bar ======= -->
+  <div id="topbar" class="d-flex align-items-center fixed-top">
+    <div class="container d-flex align-items-center justify-content-center justify-content-md-between">
+      <div class="align-items-center d-none d-md-flex">
+        <i class="bi bi-clock"></i> Monday - Saturday, 8AM to 10PM
+      </div>
+      <div class="d-flex align-items-center">
+        <i class="bi bi-phone"></i> +387 33 647 990
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= Appointment Section ======= -->
+  <section id="appointment" class="appointment section-bg">
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Make an Appointment</h2>
+        <p>Please, carefully fill in the following information.</p>
+      </div>
+
+      <div class="container">
+        <form class="col-md-9 m-auto" id="appointment-form" method="post" role="form">
+          <div class="row">
+            <div class="col-md-4 form-group mt-3">
+              <select name="pacijent" id="pacijent" class="form-select">
+                <option value="1">Odaberi pacijenta</option>
+              </select>
+            </div>
+            <div class="col-md-4 form-group mt-3">
+              <select name="doctor" id="doctor" class="form-select">
+                <option value="2">Odaberi ljekara</option>
+              </select>
+            </div>
+            <div class="mb-3"> 
+              <label for="inputdate">Appointment date</label>
+              <input
+                type="text"
+                class="form-control mt-1 datepicker"
+                id="datum"
+                name="datum"
+                placeholder="Appointment date"
+              />
+            </div>
+            <div class="mb-3">
+              <div class="col-md-4 form-group mt-3">
+              <select name="status" id="status1" class="form-select">
+                <option value="2">status</option>
+              </select>
+            </div>
+            <button type="button" onclick="addAppointment()">Submit</button>
+            <div class="horizontalgap" style ="height:40px"></div> <!--for horizontal space-->
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Custom JS File -->
+  <script>
+    $(document).ready(function() {
+      $.ajax({
+        type: "GET",
+        url: "rest/patients",
+        dataType: "json",
+        beforeSend: function (xhr) {
+        if (JSON.parse(window.localStorage.getItem("user"))) {
+          xhr.setRequestHeader(
+            "Authentication",
+            JSON.parse(window.localStorage.getItem("user")).token
+          );
+        }
+      },
+        success: function(data) {
+          var select = document.getElementById("pacijent");
+          data.forEach(function(pacijent) {
+            var option = document.createElement("option");
+            option.value = pacijent.patient_id;
+            option.text = pacijent.name + " " + pacijent.surname;
+            select.appendChild(option);
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error("Failed to fetch patients:", error);
+        }
+      });
+	  
+	   $.ajax({
+        type: "GET",
+        url: "rest/status",
+        dataType: "json",
+        beforeSend: function (xhr) {
+        if (JSON.parse(window.localStorage.getItem("user"))) {
+          xhr.setRequestHeader(
+            "Authentication",
+            JSON.parse(window.localStorage.getItem("user")).token
+          );
+        }
+      },
+        success: function(data) {
+          var select = document.getElementById("status1");
+          data.forEach(function(status) {
+            var option = document.createElement("option");
+            option.value = status.id;
+            option.text = status.name;
+            select.appendChild(option);
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error("Failed to fetch patients:", error);
+        }
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "rest/doctors",
+        dataType: "json",
+        beforeSend: function (xhr) {
+        if (JSON.parse(window.localStorage.getItem("user"))) {
+          xhr.setRequestHeader(
+            "Authentication",
+            JSON.parse(window.localStorage.getItem("user")).token
+          );
+        }
+      },
+        success: function(data) {
+          var select = document.getElementById("doctor");
+          data.forEach(function(doctor) {
+            var option = document.createElement("option");
+            option.value = doctor.id;
+            option.text = doctor.name + " " + doctor.surname;
+            select.appendChild(option);
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error("Failed to fetch doctors:", error);
+        }
+      });
+    });
+
+    function addAppointment() {
+      var doctor = document.getElementById("doctor").value;
+      var pacijent = document.getElementById("pacijent").value;
+      var date = document.getElementById("datum").value;
+      var status = document.getElementById("status").value;
+
+     if (doctor && doctor !== "2" && pacijent && pacijent !== "1") {
+        var appointmentData = {
+          doctor_id: doctor,
+          patient_id: pacijent,
+          appointment_date: date,
+          status: status
+        };
+        var jsonData = JSON.stringify(appointmentData);
+
+        $.ajax({
+          type: "POST",
+          url: "rest/appointments/add",
+          contentType: "application/json",
+          data: jsonData,
+          dataType: "json",
+          beforeSend: function (xhr) {
+        if (JSON.parse(window.localStorage.getItem("user"))) {
+          xhr.setRequestHeader(
+            "Authentication",
+            JSON.parse(window.localStorage.getItem("user")).token
+          );
+        }
+      },
+          success: function(response) {
+            if (response.success) {
+              alert("UPISANO");
+			  // Clear fields
+          
+            } else {
+              console.error("Error adding appointment:", response.error);
+              alert("greska");
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error("AJAX error:", error);
+            alert("greska");
+          }
+        });
+      } else {
+        alert("Unesite sva polja");
+      }
+    }
+	      document.getElementById("doctor").value = "2";
+          document.getElementById("pacijent").value = "1";
+          document.getElementById("datum").value = "";
+          document.getElementById("status").value = "";
+		  
+		  
+
+  </script>
+</body>
+</html>
